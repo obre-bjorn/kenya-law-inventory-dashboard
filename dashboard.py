@@ -27,8 +27,6 @@ def generateDashboard():
     summary["Performance_%"] = (summary["Actual"] / summary["Fair_Target"]) * 100
     
     
-    
-
     def grade(p):
         if p >= 70:
             return "✅ Met Expectation"
@@ -59,7 +57,7 @@ def generateDashboard():
         st.warning(f"No users in category: {category}")
         return
 
-    # --- Full Summary Table (Optional) ---
+    # --- Full Summary Table List for all users  ---
     with st.expander("📋 View Full Annual Summary Table"):
         st.dataframe(summary[["Person", "Fair_Target", "Actual", "Performance_%", "Status"]])
     
@@ -74,6 +72,54 @@ def generateDashboard():
     filtered["Month_Label"] = filtered.index.strftime("%b-%y")
 
     st.header(f"📌 Performance Dashboard for **{selected_person}**")
+    
+    
+
+    
+    
+    
+    quarter_summary = filtered.groupby("Fin_Quarter_Label").agg({
+    "Actual": "sum",
+    "Fair_Target": "sum"
+    }).reset_index()
+
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    col1, divider,col2 = st.columns([1, 0.05, 1])
+    
+    
+    #Quarterly Bar Chart
+    with col1:
+        st.subheader("📊 Quarterly Bar Chart")
+        fig_bar = px.bar(
+            quarter_summary,
+            x="Fin_Quarter_Label",
+            y=["Fair_Target", "Actual"],
+            barmode="group",
+            title="Quarterly Target vs Actual",
+            color_discrete_map={"Fair_Target": "#007bff", "Actual": "#ff6384"}
+        )
+        st.plotly_chart(fig_bar, use_container_width=True)
+        
+    #Divider for the columns    
+    with divider:
+        st.markdown("<div style='height:100%; width:1px; background-color:#ccc; margin: 0 auto;'></div>", unsafe_allow_html=True)
+
+    #Quarterly Pie chart 
+    with col2:
+        st.subheader("🥧 Quarterly Pie Chart")
+        fig_pie = px.pie(
+            quarter_summary,
+            names="Fin_Quarter_Label",
+            values="Actual",
+            title="Quarter-wise Contribution to Actual"
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+
+
+
 
     # --- Target vs Actual ---
     st.subheader("🎯 Target vs Actual")
@@ -101,6 +147,7 @@ def generateDashboard():
     )
     fig.update_layout(xaxis_title="Month", yaxis_title="Cases", xaxis_tickangle=-45)
     st.plotly_chart(fig, use_container_width=True)
+
 
     # --- Performance Line Chart ---
     st.subheader("📈 Monthly Performance (%)")
