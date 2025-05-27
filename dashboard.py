@@ -104,7 +104,7 @@ def generateDashboard():
         
     #Divider for the columns    
     with divider:
-        st.markdown("<div style='height:100%; width:1px; background-color:#ccc; margin: 0 auto;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:100%; width:5px; background-color:#ccc; margin: 0 auto;'></div>", unsafe_allow_html=True)
 
     #Quarterly Pie chart 
     with col2:
